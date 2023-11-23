@@ -2,21 +2,23 @@ package com.daki.main.objects;
 
 import com.daki.main.christmas.TimerRunnable;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 
 public class EventTimer {
-    private long startTime;
-    private long endTime;
+    private Instant startTime;
+    private Instant endTime;
     private TimerRunnable tr;
 
-    public EventTimer(long duration){
-        startTime = new Date().toInstant().getEpochSecond();
-        endTime = startTime + duration;
+    public EventTimer(Duration duration){
+        startTime = Instant.now();
+        endTime = startTime.plus(duration);
     }
 
-    public int getRemainingTime(){
-        long remainingTime = endTime - new Date().toInstant().getEpochSecond();
-        return remainingTime > 0 ? (int) remainingTime : 0;
+    public Duration getRemainingTime(){
+        Duration remainingTime = Duration.between(startTime, endTime);
+        return remainingTime.isNegative() ? Duration.ZERO : remainingTime;
     }
 
     public void startTimer(){

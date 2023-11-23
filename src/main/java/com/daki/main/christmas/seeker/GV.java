@@ -10,7 +10,7 @@ public class GV {
 
     public static List<Player> seekers = new ArrayList<>();
     public static List<Player> hiders = new ArrayList<>();
-    public static HashMap<Player, Boolean> SnowballChatCooldown = new HashMap<>();
-    public static HashMap<Player, Boolean> SugarRushCooldown = new HashMap<>();
+    public static HashMap<Player, Boolean> SnowballChatCoolDown = new HashMap<>();
+    public static HashMap<Player, Boolean> SugarRushCoolDown = new HashMap<>();
 
 }

@@ -2,6 +2,7 @@ package com.daki.main.objects;
 
 import com.daki.main.Release;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,13 +12,12 @@ public class Event {
     List<Participant> participants;
     Release release = null;
     EventTimer timer = null;
-    long duration = 3600;
+    Duration duration = Duration.ofHours(1);
 
     public Event() {
 
         running = false;
         participants = new ArrayList<>();
-
 
     }
 
@@ -86,7 +86,7 @@ public class Event {
         timer = new EventTimer(duration);
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 }

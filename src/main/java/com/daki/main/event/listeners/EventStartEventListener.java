@@ -29,13 +29,13 @@ public class EventStartEventListener implements Listener {
     public void onEventStart(EventStartEvent event) {
 
         for (Participant participant : EventManager.getExistingEvent().getParticipants()) {
-            if (participant.getEventRole().equals(EventRole.Seeker)) {
-
-                participant.getPlayer().getInventory().clear();
-                participant.getPlayer().getInventory().addItem(SeekerItems.Snowballs());
-                participant.getPlayer().getInventory().addItem(SeekerItems.Speed());
-
+            if (!participant.getEventRole().equals(EventRole.SEEKER)) {
+                continue;
             }
+            participant.getPlayer().getInventory().clear();
+            participant.getPlayer().getInventory().addItem(SeekerItems.snowballs());
+            participant.getPlayer().getInventory().addItem(SeekerItems.speed());
+
         }
 
         Sounds.playSounds();
@@ -46,7 +46,7 @@ public class EventStartEventListener implements Listener {
 
         for (Participant participant : existingEvent.getParticipants()) {
 
-            if (!participant.getEventRole().equals(EventRole.Hider)){
+            if (!participant.getEventRole().equals(EventRole.HIDER)){
                 break;
             }
 

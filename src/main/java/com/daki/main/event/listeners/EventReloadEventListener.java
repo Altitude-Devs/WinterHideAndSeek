@@ -17,15 +17,14 @@ public class EventReloadEventListener implements Listener {
     public void onEventReload(EventReloadEvent event) {
 
         for (Participant participant : EventManager.getExistingEvent().getParticipants()) {
-            if (participant.getEventRole().equals(EventRole.Seeker)) {
-
-                participant.getPlayer().getInventory().clear();
-                participant.getPlayer().getInventory().addItem(SeekerItems.Snowballs());
-                participant.getPlayer().getInventory().addItem(SeekerItems.Speed());
-                participant.getPlayer().getInventory().setHelmet(SeekerItems.Bed());
-                participant.getPlayer().updateInventory();
-
+            if (!participant.getEventRole().equals(EventRole.SEEKER)) {
+                continue;
             }
+            participant.getPlayer().getInventory().clear();
+            participant.getPlayer().getInventory().addItem(SeekerItems.snowballs());
+            participant.getPlayer().getInventory().addItem(SeekerItems.speed());
+            participant.getPlayer().getInventory().setHelmet(SeekerItems.bed());
+            participant.getPlayer().updateInventory();
         }
 
         Bukkit.broadcast(ChatColor.GREEN + "Event reloaded!", "winterhideandseek.admin");

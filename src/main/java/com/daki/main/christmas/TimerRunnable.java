@@ -9,6 +9,9 @@ import com.daki.main.objects.Participant;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
+import java.util.List;
+
 public class TimerRunnable extends Thread {
 
     EventTimer eventTimer;
@@ -19,10 +22,59 @@ public class TimerRunnable extends Thread {
         cancelled = false;
     }
 
+    private void endEvent() {
+        if (!EventManager.getExistingEvent().getRunning()) {
+            WinterHideAndSeek.getInstance().getLogger().warning("Timer attempted to close the event while it wasn't running");
+            return;
+        }
+        List<String> winnerNames = EventManager.getExistingEvent().getParticipants().stream()
+                .filter(participant -> participant.getEventRole().equals(EventRole.SEEKER))
+                .map(Participant::getPlayer).map(Player::getName)
+                .toList();
+        String message = "The winners are: " + String.join(", ", winnerNames) + "!";
+        Bukkit.broadcastMessage(message);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.hasPermission("winterhideandseek.admin")) {
+                Bukkit.getScheduler().runTask(WinterHideAndSeek.getInstance(), () -> {
+                    Bukkit.getPluginManager().callEvent(new EventEndEvent());
+                });
+                break;
+            }
+        }
+    }
+
+    private void lessThan15Min(Duration remainingTime) {
+        int remainingMinutes = (int) remainingTime.toMinutes();
+        if (remainingMinutes != 0) {
+            switch (remainingMinutes) {
+                case 10 -> sendMessage("10 minutes remaining!");
+                case 5 -> sendMessage("5 minutes remaining!");
+                case 2 -> sendMessage("2 minutes remaining!");
+                case 1 -> sendMessage("1 minute remaining!");
+            }
+            return;
+        }
+        switch (remainingTime.toSecondsPart()) {
+            case 30 -> sendMessage("30 seconds remaining");
+            case 15 -> sendMessage("15 seconds remaining");
+            case 10 -> sendMessage("10 seconds remaining");
+            case 5 -> sendMessage("5 seconds remaining");
+            case 4 -> sendMessage("4 seconds remaining");
+            case 3 -> sendMessage("3 seconds remaining");
+            case 2 -> sendMessage("2 seconds remaining");
+            case 1 -> sendMessage("1 seconds remaining");
+            case 0 -> {
+                endEvent();
+                cancelled = true;
+            }
+        }
+    }
+
     public void run(){
         int lastX = -1;
         while (!cancelled){
-            int remainingTime = eventTimer.getRemainingTime();
+            Duration remainingDuration = eventTimer.getRemainingTime();
+            int remainingTime = (int) remainingDuration.toSeconds();
             int x = remainingTime / 900; // 900 sec is 15 min
             int y = remainingTime % 900;
             if (lastX != x && -3 < y && 3 > y){ // If this isn't the same x as last x and y is between -3 and 3
@@ -42,80 +94,7 @@ public class TimerRunnable extends Thread {
                 }
 
             } else if (x == 0){
-                x = remainingTime / 60; //60 sec is a min
-                y = remainingTime % 60;
-                if (lastX != x && -3 < y && 3 > y) {
-                    lastX = x;
-                    switch (x){
-                        case 10:
-                            sendMessage("10 minutes remaining!");
-                            break;
-                        case 5:
-                            sendMessage("5 minutes remaining!");
-                            break;
-                        case 2:
-                            sendMessage("2 minutes remaining!");
-                            break;
-                        case 1:
-                            sendMessage("1 minute remaining!");
-                            break;
-                    }
-                } else if (x == 0){
-                    switch (y){
-                        case 30:
-                            sendMessage("30 seconds remaining");
-                            break;
-                        case 15:
-                            sendMessage("15 seconds remaining");
-                            break;
-                        case 10:
-                            sendMessage("10 seconds remaining");
-                            break;
-                        case 5:
-                            sendMessage("5 seconds remaining");
-                            break;
-                        case 4:
-                            sendMessage("4 seconds remaining");
-                            break;
-                        case 3:
-                            sendMessage("3 seconds remaining");
-                            break;
-                        case 2:
-                            sendMessage("2 seconds remaining");
-                            break;
-                        case 1:
-                            sendMessage("1 seconds remaining");
-                            break;
-                        case 0:
-                            if (!EventManager.getExistingEvent().getRunning()) {
-                                WinterHideAndSeek.getInstance().getLogger().warning("Timer attempted to close the event while it wasn't running");
-                                return;
-                            }
-                            StringBuilder message = new StringBuilder("The winners are: ");
-                            for (Participant p : EventManager.getExistingEvent().getParticipants()){
-                                if (p.getEventRole().equals(EventRole.Hider)) {
-                                    String playerName = p.getPlayer().getName();
-                                    message.append(playerName).append(", ");
-                                    Bukkit.getScheduler().runTask(WinterHideAndSeek.getInstance(), () -> {
-                                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + playerName + " permission settemp cmi.kit.christmaswinner true 7d");
-                                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + playerName + " -s");
-                                    });
-                                }
-                            }
-                            String messageToSend = message.toString().substring(0, message.length()-2) + "!";
-                            Bukkit.broadcastMessage(messageToSend);
-                            for (Player p : Bukkit.getOnlinePlayers()){
-                                if (p.hasPermission("winterhideandseek.admin")){
-                                    Bukkit.getScheduler().runTask(WinterHideAndSeek.getInstance(), () -> {
-                                        Bukkit.getPluginManager().callEvent(new EventEndEvent());
-                                    });
-                                    break;
-                                }
-                            }
-                            cancelled = true;
-                            break;
-                    }
-                }
+                lessThan15Min(remainingDuration);
             }
 
             try {

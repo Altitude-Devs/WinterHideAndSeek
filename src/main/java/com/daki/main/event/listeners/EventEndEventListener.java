@@ -19,9 +19,10 @@ public class EventEndEventListener implements Listener {
     public void onEventEnd(EventEndEvent event) {
 
         for (Participant participant : EventManager.getExistingEvent().getParticipants()) {
-            if (participant.getEventRole().equals(EventRole.Seeker)) {
-                participant.getPlayer().getInventory().clear();
+            if (!participant.getEventRole().equals(EventRole.SEEKER)) {
+                continue;
             }
+            participant.getPlayer().getInventory().clear();
         }
 
         Sounds.playSounds();
@@ -40,7 +41,7 @@ public class EventEndEventListener implements Listener {
         existingEvent.getTimer().stopTimer();
 
         for (Player player : Bukkit.getOnlinePlayers()){
-            existingEvent.addParticipant(new Participant(player, EventRole.Hider));
+            existingEvent.addParticipant(new Participant(player, EventRole.HIDER));
             player.sendTitle(ChatColor.DARK_GREEN + "JOINED EVENT",
                     ChatColor.GREEN + "You were reentered for the next round!",
                     20, 60, 20 );

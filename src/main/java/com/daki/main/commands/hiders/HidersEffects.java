@@ -62,7 +62,7 @@ public class HidersEffects implements CommandExecutor {
         Bukkit.broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "Hiders have begun to glow! Keep an eye out seekers!");
         List<Player> hiders = new ArrayList<>();
         for (Participant participant : EventManager.getExistingEvent().getParticipants()) {
-            if(participant.getEventRole().equals(EventRole.Hider)) {
+            if(participant.getEventRole().equals(EventRole.HIDER)) {
                 hiders.add(participant.getPlayer());
             }
         }
@@ -93,16 +93,17 @@ public class HidersEffects implements CommandExecutor {
     public void chicken(Integer duration) {
         Bukkit.broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "The hiders have begun clucking!");
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.Hider)) {
-                for (Integer i = 0; i < duration; i++) {
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), new Runnable() {
-                        public void run() {
-                            Bukkit.getWorld(player.getWorld().getName()).playSound(player.getLocation(),
-                                    Sound.ENTITY_CHICKEN_AMBIENT, 1.0F, 1.0F);
-                        }
-                    }, i * 20);
+            if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
+                continue;
+            }
+            for (int i = 0; i < duration; i++) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), new Runnable() {
+                    public void run() {
+                        Bukkit.getWorld(player.getWorld().getName()).playSound(player.getLocation(),
+                                Sound.ENTITY_CHICKEN_AMBIENT, 1.0F, 1.0F);
+                    }
+                }, i * 20L);
 
-                }
             }
         }
     }
@@ -114,29 +115,30 @@ public class HidersEffects implements CommandExecutor {
                 + ChatColor.DARK_RED + "R" + ChatColor.DARK_GREEN + "K" + ChatColor.DARK_RED + "S" + ChatColor.GOLD
                 + ChatColor.BOLD.toString() + " just went off above the hiders!");
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.Hider)) {
-                for (Integer i = 0; i < amount; i++) {
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), new Runnable() {
-                        public void run() {
-                            Firework fw = (Firework) Bukkit.getWorld(player.getWorld().getName())
-                                    .spawnEntity(player.getLocation(), EntityType.FIREWORK);
-                            FireworkMeta fireworkMeta = fw.getFireworkMeta();
-                            FireworkEffect.Builder builder = FireworkEffect.builder();
-                            builder.withColor(Color.GREEN);
-                            builder.withColor(Color.RED);
-                            builder.withFlicker();
-                            builder.withFade(Color.GREEN);
-                            builder.withFade(Color.RED);
-                            builder.with(FireworkEffect.Type.STAR);
-                            builder.trail(true);
-                            FireworkEffect effect = builder.build();
-                            fireworkMeta.addEffect(effect);
-                            fireworkMeta.setPower(0);
-                            fw.setFireworkMeta(fireworkMeta);
+            if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
+                continue;
+            }
+            for (Integer i = 0; i < amount; i++) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), new Runnable() {
+                    public void run() {
+                        Firework fw = (Firework) Bukkit.getWorld(player.getWorld().getName())
+                                .spawnEntity(player.getLocation(), EntityType.FIREWORK);
+                        FireworkMeta fireworkMeta = fw.getFireworkMeta();
+                        FireworkEffect.Builder builder = FireworkEffect.builder();
+                        builder.withColor(Color.GREEN);
+                        builder.withColor(Color.RED);
+                        builder.withFlicker();
+                        builder.withFade(Color.GREEN);
+                        builder.withFade(Color.RED);
+                        builder.with(FireworkEffect.Type.STAR);
+                        builder.trail(true);
+                        FireworkEffect effect = builder.build();
+                        fireworkMeta.addEffect(effect);
+                        fireworkMeta.setPower(0);
+                        fw.setFireworkMeta(fireworkMeta);
 
-                        }
-                    }, i * 2);
-                }
+                    }
+                }, i * 2);
             }
         }
     }
@@ -144,10 +146,11 @@ public class HidersEffects implements CommandExecutor {
     public void levitate(Integer duration) {
         Bukkit.getServer().broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "levitate");
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.Hider)) {
-                PotionEffect pot = new PotionEffect(PotionEffectType.LEVITATION, duration * 20, 0);
-                player.addPotionEffect(pot);
+            if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
+                continue;
             }
+            PotionEffect pot = new PotionEffect(PotionEffectType.LEVITATION, duration * 20, 0);
+            player.addPotionEffect(pot);
         }
     }
 
@@ -155,10 +158,11 @@ public class HidersEffects implements CommandExecutor {
         Bukkit.broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "The hiders are now frozen in place for "
                 + duration.toString() + " seconds!");
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.Hider)) {
-                PotionEffect pot = new PotionEffect(PotionEffectType.SLOW, duration * 20, 1000);
-                player.addPotionEffect(pot);
+            if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
+                continue;
             }
+            PotionEffect pot = new PotionEffect(PotionEffectType.SLOW, duration * 20, 1000);
+            player.addPotionEffect(pot);
         }
     }
 
@@ -167,7 +171,7 @@ public class HidersEffects implements CommandExecutor {
             Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
             Team team = board.registerNewTeam("Hiders");
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.Hider)) {
+                if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
                     team.addEntry(player.getName());
                     player.setScoreboard(board);
                 }
@@ -177,7 +181,7 @@ public class HidersEffects implements CommandExecutor {
             Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
             Team team = board.registerNewTeam("Hiders");
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.Hider)) {
+                if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
                     team.addEntry(player.getName());
                     player.setScoreboard(board);
                 }

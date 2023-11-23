@@ -13,12 +13,13 @@ public class onTryToGetRidOfItem implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getCurrentItem() == null){return;}
-        if (!event.getWhoClicked().hasPermission("winterhideandseek.admin")
-                && (event.getCurrentItem().getType().equals(Material.SUGAR)
-                        || event.getCurrentItem().getType().equals(Material.SNOWBALL))) {
-            event.setCancelled(true);
-            event.getWhoClicked().closeInventory();
+        if (event.getWhoClicked().hasPermission("winterhideandseek.admin")
+                || (!event.getCurrentItem().getType().equals(Material.SUGAR)
+                && !event.getCurrentItem().getType().equals(Material.SNOWBALL))) {
+            return;
         }
+        event.setCancelled(true);
+        event.getWhoClicked().closeInventory();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -32,11 +33,13 @@ public class onTryToGetRidOfItem implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void OnPlayerSwapHandItem(PlayerSwapHandItemsEvent event) {
-        if (!event.getPlayer().hasPermission("winterhideandseek.admin") && event.getOffHandItem() != null) {
-            if (event.getOffHandItem().getType().equals(Material.SUGAR)
-                    || event.getOffHandItem().getType().equals(Material.SNOWBALL)) {
-                event.setCancelled(true);
-            }
+        if (event.getPlayer().hasPermission("winterhideandseek.admin") || event.getOffHandItem() == null) {
+            return;
         }
+        if (!event.getOffHandItem().getType().equals(Material.SUGAR)
+                && !event.getOffHandItem().getType().equals(Material.SNOWBALL)) {
+            return;
+        }
+        event.setCancelled(true);
     }
 }

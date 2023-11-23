@@ -12,14 +12,16 @@ public class onSnowballThrow implements Listener {
 
     @EventHandler
     public void onThrow(ProjectileLaunchEvent e) {
-        if (e.getEntity() instanceof Snowball) {
-            Player player = (Player) e.getEntity().getShooter();
-            if (player != null && EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.Seeker)) {
-                if (player.getInventory().getItemInMainHand().getAmount() < 16) {
-                    player.getInventory().getItemInMainHand().setAmount(16);
-                    player.updateInventory();
-                }
-            }
+        if (!(e.getEntity() instanceof Snowball)) {
+            return;
+        }
+        Player player = (Player) e.getEntity().getShooter();
+        if (player == null || !EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.SEEKER)) {
+            return;
+        }
+        if (player.getInventory().getItemInMainHand().getAmount() < 16) {
+            player.getInventory().getItemInMainHand().setAmount(16);
+            player.updateInventory();
         }
     }
 }

@@ -24,7 +24,7 @@ public class onPlayerConnect implements Listener{
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 "lp user " + player.getName() + " permission settemp cmi.kit.christmas true 7d"); //Give them the participation reward
         if (!event.getRunning()){
-            event.addParticipant(new Participant(player, EventRole.Hider));
+            event.addParticipant(new Participant(player, EventRole.HIDER));
             player.sendTitle(ChatColor.DARK_GREEN + "JOINED EVENT",
                     ChatColor.GREEN + "You are a hider, the game will start soon!",
                     20, 60, 20 );

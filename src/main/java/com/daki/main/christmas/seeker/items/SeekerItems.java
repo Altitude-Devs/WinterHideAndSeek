@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class SeekerItems {
 
-    public static ItemStack Speed() {
+    public static ItemStack speed() {
 
         ItemStack speed = new ItemStack(Material.SUGAR);
         ItemMeta meta = speed.getItemMeta();
@@ -30,7 +28,7 @@ public class SeekerItems {
 
     }
 
-    public static ItemStack SpeedCooldown() {
+    public static ItemStack speedCoolDown() {
 
         ItemStack speed = new ItemStack(Material.SUGAR);
         ItemMeta meta = speed.getItemMeta();
@@ -47,7 +45,7 @@ public class SeekerItems {
 
     }
 
-    public static ItemStack Snowballs() {
+    public static ItemStack snowballs() {
 
         ItemStack snowball = new ItemStack(Material.SNOWBALL);
         ItemMeta meta = snowball.getItemMeta();
@@ -63,7 +61,7 @@ public class SeekerItems {
 
     }
 
-    public static ItemStack Bed() {
+    public static ItemStack bed() {
 
         ItemStack bed = new ItemStack(Material.RED_BED, 1);
         ItemMeta meta = bed.getItemMeta();

@@ -26,7 +26,7 @@ public class Release {
             Sounds.playSounds();
 
             for (Participant participant : EventManager.getExistingEvent().getParticipants()) {
-                if (participant.getEventRole().equals(EventRole.Seeker)) {
+                if (participant.getEventRole().equals(EventRole.SEEKER)) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "cmi warp SeekersStartWarp " + participant.getPlayer().getName() + " -s");
                 }
             }

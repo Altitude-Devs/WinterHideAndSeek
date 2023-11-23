@@ -21,44 +21,47 @@ public class onSnowballHit implements Listener {
         if (!EventManager.getExistingEvent().getRunning()){
             return;
         }
-        if (e.getEntity().getType().equals(EntityType.SNOWBALL)) {
-            if (e.getHitEntity() instanceof Player) {
-                Player reciever = (Player) e.getHitEntity();
-                Participant participantFromName = EventManager.getExistingEvent().getParticipantFromPlayerName(reciever.getName());
-                if (participantFromName!=null && participantFromName.getEventRole().equals(EventRole.Hider)) {
-                    reciever.setHealth(0);
-                    Player sender = (Player) e.getEntity().getShooter();
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            "lp user " + reciever.getName() + " permission unset christmas.hider");
-                    if (!GV.SnowballChatCooldown.containsKey(reciever)) {
+        if (!e.getEntity().getType().equals(EntityType.SNOWBALL)) {
+            return;
+        }
+        if (!(e.getHitEntity() instanceof Player receiver)) {
+            return;
+        }
+        Participant participantFromName = EventManager.getExistingEvent().getParticipantFromPlayerName(receiver.getName());
+        if (participantFromName == null || !participantFromName.getEventRole().equals(EventRole.HIDER)) {
+            return;
+        }
+        receiver.setHealth(0);
+        Player sender = (Player) e.getEntity().getShooter();
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                "lp user " + receiver.getName() + " permission unset christmas.hider");
+        if (GV.SnowballChatCoolDown.containsKey(receiver)) {
+            return;
+        }
 
-                        Integer hiders = 0;
-                        Event existingEvent = EventManager.getExistingEvent();
-                        existingEvent.removeParticipant(existingEvent.getParticipantFromPlayerName(reciever.getName()));
+        int hiders = 0;
+        Event existingEvent = EventManager.getExistingEvent();
+        existingEvent.removeParticipant(existingEvent.getParticipantFromPlayerName(receiver.getName()));
 
-                        for (Participant participant : existingEvent.getParticipants()){
-                            if (participant.getEventRole().equals(EventRole.Hider)){
-                                hiders++;
-                            }
-                        }
-                        if (hiders == 1) {
-                            Bukkit.getServer().broadcastMessage(ChatColor.RED + sender.getName() + " has found "
-                                    + reciever.getName() + ". " + hiders + " hider remaining.");
-                            GV.SnowballChatCooldown.put(reciever, true);
-                        } else if (hiders != 1) {
-                            Bukkit.getServer().broadcastMessage(ChatColor.RED + sender.getName() + " has found "
-                                    + reciever.getName() + ". " + hiders + " hiders remaining.");
-                            GV.SnowballChatCooldown.put(reciever, true);
-                        }
-
-                        new BukkitRunnable() {
-                            public void run() {
-                                GV.SnowballChatCooldown.remove(reciever);
-                            }
-                        }.runTaskLater(WinterHideAndSeek.getInstance(), 100);
-                    }
-                }
+        for (Participant participant : existingEvent.getParticipants()){
+            if (participant.getEventRole().equals(EventRole.HIDER)){
+                hiders++;
             }
         }
+        if (hiders == 1) {
+            Bukkit.getServer().broadcastMessage(ChatColor.RED + sender.getName() + " has found "
+                    + receiver.getName() + ". " + hiders + " hider remaining.");
+            GV.SnowballChatCoolDown.put(receiver, true);
+        } else if (hiders != 1) {
+            Bukkit.getServer().broadcastMessage(ChatColor.RED + sender.getName() + " has found "
+                    + receiver.getName() + ". " + hiders + " hiders remaining.");
+            GV.SnowballChatCoolDown.put(receiver, true);
+        }
+
+        new BukkitRunnable() {
+            public void run() {
+                GV.SnowballChatCoolDown.remove(receiver);
+            }
+        }.runTaskLater(WinterHideAndSeek.getInstance(), 100);
     }
 }
