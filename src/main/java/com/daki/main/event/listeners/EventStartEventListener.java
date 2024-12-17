@@ -107,29 +107,4 @@ public class EventStartEventListener implements Listener {
 
         return locations;
     }
-
-    public void nameTag(Team team, boolean enabled) {
-        if (enabled) {
-            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
-        } else {
-            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
-        }
-    }
-
-    private Team fillHidersTeam() {
-        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-        Team hiders = board.getTeam("Hiders");
-        if (hiders == null) {
-            hiders = board.registerNewTeam("Hiders");
-        }
-        hiders.removeEntries(hiders.getEntries());
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
-                continue;
-            }
-            hiders.addEntry(player.getName());
-            player.setScoreboard(board);
-        }
-        return hiders;
-    }
 }

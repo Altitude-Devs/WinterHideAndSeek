@@ -1,8 +1,13 @@
 package com.daki.main.objects;
 
 import com.daki.main.Release;
+import com.daki.main.objects.Enums.EventRole;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -23,20 +28,32 @@ public class Event {
     @Setter
     Duration duration = Duration.ofHours(1);
 
+    private final Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+    private Team hidersTeam;
+
     public Event() {
         running = false;
         participants = new ArrayList<>();
+        initHidersTeam();
     }
 
     public void addParticipant(Participant participant) {
-        participant.getPlayer().getInventory().clear();
-        List<Participant> filteredParticipants = participants.stream().filter(filterParticipant -> filterParticipant.getPlayer().getUniqueId().equals(participant.getPlayer().getUniqueId())).toList();
+        Player player = participant.getPlayer();
+        player.getInventory().clear();
+        List<Participant> filteredParticipants = participants.stream().filter(filterParticipant -> filterParticipant.getPlayer().getUniqueId().equals(player.getUniqueId())).toList();
         filteredParticipants.forEach(p -> participants.remove(p));
         this.participants.add(participant);
+        if (participant.getEventRole().equals(EventRole.HIDER)) {
+            hidersTeam.addEntry(player.getName());
+            player.setScoreboard(board);
+        }
     }
 
     public void removeParticipant(Participant participant) {
         this.participants.remove(participant);
+        if (participant.getEventRole().equals(EventRole.HIDER)) {
+            hidersTeam.removeEntry(participant.getPlayer().getName());
+        }
     }
 
     public Participant getParticipantFromPlayerName(String playerName) {
@@ -50,6 +67,7 @@ public class Event {
 
     public void clearParticipants() {
         participants.clear();
+        hidersTeam.removeEntries(hidersTeam.getEntries());
     }
 
     public void createRelease() {
@@ -58,6 +76,22 @@ public class Event {
 
     public void createTimer() {
         timer = new EventTimer(duration);
+    }
+
+    public void nameTag(Team team, boolean enabled) {
+        if (enabled) {
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+        } else {
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+        }
+    }
+
+    private Team initHidersTeam() {
+        hidersTeam = board.getTeam("Hiders");
+        if (hidersTeam == null) {
+            hidersTeam = board.registerNewTeam("Hiders");
+        }
+        return hidersTeam;
     }
 
 }
