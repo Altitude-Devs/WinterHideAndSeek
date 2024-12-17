@@ -1,3 +1,5 @@
 /.idea/
 /WinterHideAndSeek.iml
 /target/
+.gradle
+build
