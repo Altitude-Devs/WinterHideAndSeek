@@ -6,7 +6,7 @@ plugins {
 
 group = "com.alttd.event"
 version = System.getenv("BUILD_NUMBER") ?: "1.0-SNAPSHOT"
-description = "Altitude's 121 event plugin"
+description = "Altitude's Christmas hide and seek plugin"
 
 apply<JavaLibraryPlugin>()
 
