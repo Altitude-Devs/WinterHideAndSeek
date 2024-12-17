@@ -61,7 +61,6 @@ public class HidersEffects implements CommandExecutor {
     }
 
     public void glow(Integer everyXseconds, Integer forYseconds) {
-
         glowRunning = true;
         Bukkit.broadcast(miniMessage.deserialize("<gold><b>Hiders have begun to glow! Keep an eye out seekers!</b></gold>"));
         List<Player> hiders = new ArrayList<>();
@@ -151,27 +150,5 @@ public class HidersEffects implements CommandExecutor {
             PotionEffect pot = new PotionEffect(PotionEffectType.SLOWNESS, duration * 20, 1000);
             player.addPotionEffect(pot);
         }
-    }
-
-    public void nameTag(String string) {
-        if (string.equals("off")) {
-            Team team = createTeam();
-            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
-        } else if (string.equals("on")) {
-            Team team = createTeam();
-            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
-        }
-    }
-
-    private Team createTeam() {
-        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-        Team team = board.registerNewTeam("Hiders");
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
-                team.addEntry(player.getName());
-                player.setScoreboard(board);
-            }
-        }
-        return team;
     }
 }

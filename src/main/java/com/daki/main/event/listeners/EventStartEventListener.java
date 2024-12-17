@@ -20,6 +20,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,13 +83,14 @@ public class EventStartEventListener implements Listener {
         new BukkitRunnable() {
             public void run() {
                 existingEvent.createTimer();
+                Team team = fillHidersTeam();
+                nameTag(team, false);
                 release.release();
             }
 
         }.runTaskLater(WinterHideAndSeek.getInstance(), 6000); //6000
 
         EventManager.getExistingEvent().setRunning(true);
-
     }
 
     private ArrayList<Location> getSeekerSpawnLocations() {
@@ -103,5 +106,30 @@ public class EventStartEventListener implements Listener {
         }
 
         return locations;
+    }
+
+    public void nameTag(Team team, boolean enabled) {
+        if (enabled) {
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+        } else {
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+        }
+    }
+
+    private Team fillHidersTeam() {
+        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+        Team hiders = board.getTeam("Hiders");
+        if (hiders == null) {
+            hiders = board.registerNewTeam("Hiders");
+        }
+        hiders.removeEntries(hiders.getEntries());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
+                continue;
+            }
+            hiders.addEntry(player.getName());
+            player.setScoreboard(board);
+        }
+        return hiders;
     }
 }
