@@ -4,12 +4,17 @@ import com.daki.main.christmas.TimerRunnable;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class EventTimer {
-    private Instant startTime;
-    private Instant endTime;
+    private final Instant startTime;
+    private final Instant endTime;
     private TimerRunnable tr;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> currentTask;
 
     public EventTimer(Duration duration){
         startTime = Instant.now();
@@ -26,12 +31,13 @@ public class EventTimer {
             tr.stopTimer();
         }
         tr = new TimerRunnable(this);
-        tr.start();
+        currentTask = scheduler.scheduleAtFixedRate(tr, 1, 1, TimeUnit.SECONDS);
     }
 
     public void stopTimer(){
         if (tr != null){
             tr.stopTimer();
+            currentTask.cancel(true);
         }
     }
 }

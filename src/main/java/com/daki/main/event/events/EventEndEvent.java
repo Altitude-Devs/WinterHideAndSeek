@@ -2,6 +2,7 @@ package com.daki.main.event.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class EventEndEvent extends Event {
 
@@ -12,7 +13,7 @@ public class EventEndEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 

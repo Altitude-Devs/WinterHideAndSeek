@@ -8,11 +8,9 @@ import com.daki.main.Sounds;
 import com.daki.main.event.manager.EventManager;
 import com.daki.main.objects.Enums.EventRole;
 import com.daki.main.objects.Participant;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Sound;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,34 +20,40 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.NotNull;
 
 public class HidersEffects implements CommandExecutor {
 
     public static Boolean glowRunning = false;
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
 
         if (args.length == 0) return true;
 
-        if (args[0].equals("glow")) {
-            if (args[1].equals("off")) {
-                glowOff();
-            } else
-                glow(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-            Sounds.playSounds();
-        } else if (args[0].equals("chicken")) {
-            chicken(Integer.parseInt(args[1]));
-            Sounds.playSounds();
-        } else if (args[0].equals("fireworks")) {
-            fireworks(Integer.parseInt(args[1]));
-            Sounds.playSounds();
-        } else if (args[0].equals("freeze")) {
-            freeze(Integer.parseInt(args[1]));
-            Sounds.playSounds();
+        switch (args[0]) {
+            case "glow" -> {
+                if (args[1].equals("off")) {
+                    glowOff();
+                } else
+                    glow(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+                Sounds.playSounds();
+            }
+            case "chicken" -> {
+                chicken(Integer.parseInt(args[1]));
+                Sounds.playSounds();
+            }
+            case "fireworks" -> {
+                fireworks(Integer.parseInt(args[1]));
+                Sounds.playSounds();
+            }
+            case "freeze" -> {
+                freeze(Integer.parseInt(args[1]));
+                Sounds.playSounds();
+            }
         }
 
         return false;
@@ -59,92 +63,75 @@ public class HidersEffects implements CommandExecutor {
     public void glow(Integer everyXseconds, Integer forYseconds) {
 
         glowRunning = true;
-        Bukkit.broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "Hiders have begun to glow! Keep an eye out seekers!");
+        Bukkit.broadcast(miniMessage.deserialize("<gold><b>Hiders have begun to glow! Keep an eye out seekers!</b></gold>"));
         List<Player> hiders = new ArrayList<>();
         for (Participant participant : EventManager.getExistingEvent().getParticipants()) {
-            if(participant.getEventRole().equals(EventRole.HIDER)) {
+            if (participant.getEventRole().equals(EventRole.HIDER)) {
                 hiders.add(participant.getPlayer());
             }
         }
 
-        for (Integer i = 0; i < hiders.size(); i++) {
-            Player player = hiders.get(i);
-            new BukkitRunnable() {
-                public void run() {
-                    player.setGlowing(true);
-                    new BukkitRunnable() {
-                        public void run() {
-                            player.setGlowing(false);
-                        }
-                    }.runTaskLater(WinterHideAndSeek.getInstance(), forYseconds * 20);
-                }
-            }.runTaskLater(WinterHideAndSeek.getInstance(), everyXseconds * 20 + i * everyXseconds * 20);
-        }
-
+        GlowingTask glowingTask = new GlowingTask(hiders, everyXseconds, forYseconds);
+        glowingTask.start();
     }
 
     public void glowOff() {
-
         glowRunning = false;
-        Bukkit.broadcast(ChatColor.RED + "Glow turned off.", "winterhideandseek.admin");
+        Bukkit.broadcast(miniMessage.deserialize("<red>Glow turned off.</red>"), "winterhideandseek.admin");
 
     }
 
     public void chicken(Integer duration) {
-        Bukkit.broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "The hiders have begun clucking!");
+        Bukkit.broadcast(miniMessage.deserialize("<gold><b>The hiders have begun clucking!</b></gold>"));
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
                 continue;
             }
             for (int i = 0; i < duration; i++) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), new Runnable() {
-                    public void run() {
-                        Bukkit.getWorld(player.getWorld().getName()).playSound(player.getLocation(),
-                                Sound.ENTITY_CHICKEN_AMBIENT, 1.0F, 1.0F);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), () -> {
+                    World world = Bukkit.getWorld(player.getWorld().getName());
+                    if (world == null) {
+                        return;
                     }
+                    world.playSound(player.getLocation(), Sound.ENTITY_CHICKEN_AMBIENT, 1.0F, 1.0F);
                 }, i * 20L);
-
             }
         }
     }
 
     public void fireworks(Integer amount) {
-
-        Bukkit.broadcastMessage(ChatColor.DARK_RED + "F" + ChatColor.DARK_GREEN + "I" + ChatColor.DARK_RED + "R"
-                + ChatColor.DARK_GREEN + "E" + ChatColor.DARK_RED + "W" + ChatColor.DARK_GREEN + "O"
-                + ChatColor.DARK_RED + "R" + ChatColor.DARK_GREEN + "K" + ChatColor.DARK_RED + "S" + ChatColor.GOLD
-                + ChatColor.BOLD.toString() + " just went off above the hiders!");
+        String message = "<dark_red>F<dark_green>I<dark_red>R<dark_green>E<dark_red>W<dark_green>O<dark_red>R<dark_green>K<dark_red>S"
+                         + "<gold><bold> just went off above the hiders!";
+        Bukkit.broadcast(miniMessage.deserialize(message));
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
                 continue;
             }
-            for (Integer i = 0; i < amount; i++) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), new Runnable() {
-                    public void run() {
-                        Firework fw = (Firework) Bukkit.getWorld(player.getWorld().getName())
-                                .spawnEntity(player.getLocation(), EntityType.FIREWORK);
-                        FireworkMeta fireworkMeta = fw.getFireworkMeta();
-                        FireworkEffect.Builder builder = FireworkEffect.builder();
-                        builder.withColor(Color.GREEN);
-                        builder.withColor(Color.RED);
-                        builder.withFlicker();
-                        builder.withFade(Color.GREEN);
-                        builder.withFade(Color.RED);
-                        builder.with(FireworkEffect.Type.STAR);
-                        builder.trail(true);
-                        FireworkEffect effect = builder.build();
-                        fireworkMeta.addEffect(effect);
-                        fireworkMeta.setPower(0);
-                        fw.setFireworkMeta(fireworkMeta);
+            for (int i = 0; i < amount; i++) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), () -> {
+                    Firework fw = (Firework) player.getWorld()
+                            .spawnEntity(player.getLocation(), EntityType.FIREWORK_ROCKET);
+                    FireworkMeta fireworkMeta = fw.getFireworkMeta();
+                    FireworkEffect.Builder builder = FireworkEffect.builder();
+                    builder.withColor(Color.GREEN);
+                    builder.withColor(Color.RED);
+                    builder.withFlicker();
+                    builder.withFade(Color.GREEN);
+                    builder.withFade(Color.RED);
+                    builder.with(FireworkEffect.Type.STAR);
+                    builder.trail(true);
+                    FireworkEffect effect = builder.build();
+                    fireworkMeta.addEffect(effect);
+                    fireworkMeta.setPower(0);
+                    fw.setFireworkMeta(fireworkMeta);
 
-                    }
-                }, i * 2);
+                }, i * 2L);
             }
         }
     }
 
     public void levitate(Integer duration) {
-        Bukkit.getServer().broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "levitate");
+        Bukkit.getServer().broadcast(miniMessage.deserialize("<gold><b>levitate</b></gold>"));
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
                 continue;
@@ -155,39 +142,36 @@ public class HidersEffects implements CommandExecutor {
     }
 
     public void freeze(Integer duration) {
-        Bukkit.broadcastMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "The hiders are now frozen in place for "
-                + duration.toString() + " seconds!");
+        Bukkit.getServer().broadcast(miniMessage.deserialize("<gold><b>The hiders are now frozen in place for <duration> seconds!</b></gold>",
+                Placeholder.parsed("duration", duration.toString())));
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
                 continue;
             }
-            PotionEffect pot = new PotionEffect(PotionEffectType.SLOW, duration * 20, 1000);
+            PotionEffect pot = new PotionEffect(PotionEffectType.SLOWNESS, duration * 20, 1000);
             player.addPotionEffect(pot);
         }
     }
 
-    public void nametag(String string) {
+    public void nameTag(String string) {
         if (string.equals("off")) {
-            Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-            Team team = board.registerNewTeam("Hiders");
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
-                    team.addEntry(player.getName());
-                    player.setScoreboard(board);
-                }
-            }
+            Team team = createTeam();
             team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
         } else if (string.equals("on")) {
-            Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-            Team team = board.registerNewTeam("Hiders");
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
-                    team.addEntry(player.getName());
-                    player.setScoreboard(board);
-                }
-            }
+            Team team = createTeam();
             team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
         }
+    }
 
+    private Team createTeam() {
+        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+        Team team = board.registerNewTeam("Hiders");
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
+                team.addEntry(player.getName());
+                player.setScoreboard(board);
+            }
+        }
+        return team;
     }
 }

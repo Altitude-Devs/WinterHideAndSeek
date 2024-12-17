@@ -4,7 +4,6 @@ import com.daki.main.WinterHideAndSeek;
 import com.daki.main.christmas.seeker.items.SeekerItems;
 import com.daki.main.event.manager.EventManager;
 import com.daki.main.objects.Enums.EventRole;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,7 +21,7 @@ public class onAbilityUse implements Listener {
         Player player = e.getPlayer();
         if (!player.getInventory().getItemInMainHand().equals(SeekerItems.speed())) {
             if (player.getInventory().getItemInMainHand().equals(SeekerItems.speedCoolDown())) {
-                player.sendMessage(ChatColor.RED + "Sugar Rush is on a cooldown!");
+                player.sendRichMessage("<red>Sugar Rush is on a cooldown!</red>");
             }
             return;
         }
@@ -38,7 +37,7 @@ public class onAbilityUse implements Listener {
             public void run() {
                 player.getInventory().remove(SeekerItems.speedCoolDown());
                 player.getInventory().addItem(SeekerItems.speed());
-                player.sendMessage(ChatColor.GREEN + "Sugar Rush is ready to be used again!");
+                player.sendRichMessage("<green>Sugar Rush is ready to be used again!</green>");
             }
         }.runTaskLater(WinterHideAndSeek.getInstance(), 600);
     }

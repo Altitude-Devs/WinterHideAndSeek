@@ -7,15 +7,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class onParticipantLeave implements Listener {
+public class ParticipantLeaveEvent implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event){
-
         Participant participant = EventManager.getExistingEvent().getParticipantFromPlayerName(event.getPlayer().getName());
-
         EventManager.getExistingEvent().removeParticipant(participant);
-
     }
 
 }

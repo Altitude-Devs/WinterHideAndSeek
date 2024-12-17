@@ -33,7 +33,7 @@ public class onTryToGetRidOfItem implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void OnPlayerSwapHandItem(PlayerSwapHandItemsEvent event) {
-        if (event.getPlayer().hasPermission("winterhideandseek.admin") || event.getOffHandItem() == null) {
+        if (event.getPlayer().hasPermission("winterhideandseek.admin") || event.getOffHandItem().getType().isAir()) {
             return;
         }
         if (!event.getOffHandItem().getType().equals(Material.SUGAR)

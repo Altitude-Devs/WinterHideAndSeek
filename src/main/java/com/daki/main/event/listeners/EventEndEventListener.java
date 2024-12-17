@@ -6,14 +6,20 @@ import com.daki.main.event.manager.EventManager;
 import com.daki.main.objects.Enums.EventRole;
 import com.daki.main.objects.Event;
 import com.daki.main.objects.Participant;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.time.Duration;
+
 public class EventEndEventListener implements Listener {
+
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEventEnd(EventEndEvent event) {
@@ -27,10 +33,10 @@ public class EventEndEventListener implements Listener {
 
         Sounds.playSounds();
 
+        Title endRoundTitle = Title.title(miniMessage.deserialize("<white>This round is now over!</white>"), Component.empty(),
+                Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(1)));
         for (Player player : Bukkit.getOnlinePlayers()) {
-
-            player.sendTitle(ChatColor.WHITE + "This round is now over!", "", 20, 100, 20);
-
+            player.showTitle(endRoundTitle);
         }
 
 
@@ -40,16 +46,15 @@ public class EventEndEventListener implements Listener {
         existingEvent.getRelease().setCancelled(false);
         existingEvent.getTimer().stopTimer();
 
+        Title newRoundTitle = Title.title(miniMessage.deserialize("<dark_green>JOINED EVENT</dark_green>"),
+                miniMessage.deserialize("<green>You were re-entered into the next round!</green>"),
+                Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(3), Duration.ofSeconds(1)));
         for (Player player : Bukkit.getOnlinePlayers()){
             existingEvent.addParticipant(new Participant(player, EventRole.HIDER));
-            player.sendTitle(ChatColor.DARK_GREEN + "JOINED EVENT",
-                    ChatColor.GREEN + "You were reentered for the next round!",
-                    20, 60, 20 );
+            player.showTitle(newRoundTitle);
         }
 
-        Bukkit.broadcast(ChatColor.RED + "Event shut down!", "winterhideandseek.admin");
-
-
+        Bukkit.broadcast(miniMessage.deserialize("<red>Event shut down!</red>"), "winterhideandseek.admin");
     }
 
 }

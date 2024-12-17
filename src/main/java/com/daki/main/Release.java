@@ -3,10 +3,13 @@ package com.daki.main;
 import com.daki.main.event.manager.EventManager;
 import com.daki.main.objects.Enums.EventRole;
 import com.daki.main.objects.Participant;
+import com.daki.main.objects.TitleCreator;
+import lombok.Setter;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 public class Release {
+    @Setter
     private boolean cancelled;
     private boolean started;
 
@@ -15,11 +18,7 @@ public class Release {
         started = false;
     }
 
-    public void setCancelled(boolean cancelled){
-        this.cancelled = cancelled;
-    }
-
-    public void release(){
+    public void release() {
         System.out.println("releasing");
         if (!cancelled && !started) {
             started = true;
@@ -31,9 +30,8 @@ public class Release {
                 }
             }
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendTitle("SEEKERS RELEASED", "GOOD LUCK", 10, 60, 10);
-            }
+            Title title = TitleCreator.createTitle("SEEKERS RELEASED", "GOOD LUCK", 1, 3, 1);
+            Bukkit.getOnlinePlayers().forEach(player -> player.showTitle(title));
         }
         EventManager.getExistingEvent().getTimer().startTimer();
     }

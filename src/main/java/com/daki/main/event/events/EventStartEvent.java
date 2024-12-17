@@ -3,6 +3,7 @@ package com.daki.main.event.events;
 import com.daki.main.event.manager.EventManager;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
@@ -19,7 +20,7 @@ public class EventStartEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 

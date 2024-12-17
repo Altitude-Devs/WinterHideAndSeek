@@ -5,14 +5,14 @@ import com.daki.main.event.events.EventReloadEvent;
 import com.daki.main.event.manager.EventManager;
 import com.daki.main.objects.Enums.EventRole;
 import com.daki.main.objects.Participant;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class EventReloadEventListener implements Listener {
-
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEventReload(EventReloadEvent event) {
 
@@ -27,7 +27,7 @@ public class EventReloadEventListener implements Listener {
             participant.getPlayer().updateInventory();
         }
 
-        Bukkit.broadcast(ChatColor.GREEN + "Event reloaded!", "winterhideandseek.admin");
+        Bukkit.broadcast(miniMessage.deserialize("<green>Event reloaded!</green>"), "winterhideandseek.admin");
 
     }
 

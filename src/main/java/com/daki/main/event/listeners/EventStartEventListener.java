@@ -9,8 +9,10 @@ import com.daki.main.event.manager.EventManager;
 import com.daki.main.objects.Enums.EventRole;
 import com.daki.main.objects.Event;
 import com.daki.main.objects.Participant;
+import com.daki.main.objects.TitleCreator;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.Random;
 
 public class EventStartEventListener implements Listener {
+
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEventStart(EventStartEvent event) {
@@ -44,6 +48,8 @@ public class EventStartEventListener implements Listener {
         Random r = new Random();
         Event existingEvent = EventManager.getExistingEvent();
 
+        Title startingTitle = TitleCreator.createTitle("<white>WINTER</white>",
+                "<white>HIDE AND SEEK EVENT IS STARTING</white>", 1, 5, 1);
         for (Participant participant : existingEvent.getParticipants()) {
 
             if (!participant.getEventRole().equals(EventRole.HIDER)){
@@ -54,17 +60,19 @@ public class EventStartEventListener implements Listener {
 
             player.teleport(seekerSpawnLocations.get(r.nextInt(seekerSpawnLocations.size())));
 
-            player.sendTitle(ChatColor.WHITE + "WINTER", ChatColor.WHITE + "HIDE AND SEEK EVENT IS STARTING", 20, 100, 20);
+            player.showTitle(startingTitle);
 
-            new BukkitRunnable() {
-                public void run() {
-                    player.sendTitle(ChatColor.WHITE + "FIND A SPOT TO HIDE IN", "SEEKERS WILL BE RELEASED IN 5 MINUTES", 20, 100, 20);
-                }
-
-            }.runTaskLater(WinterHideAndSeek.getInstance(), 120);
         }
+        Title hideSpotTitle = TitleCreator.createTitle("<white>FIND A SPOT TO HIDE IN",
+                "SEEKERS WILL BE RELEASED IN 5 MINUTES", 1, 5, 1);
+        new BukkitRunnable() {
+            public void run() {
+                existingEvent.getParticipants().forEach(participant -> participant.getPlayer().showTitle(hideSpotTitle));
+            }
 
-        Bukkit.broadcast(ChatColor.GREEN + "Event started!", "winterhideandseek.admin");
+        }.runTaskLater(WinterHideAndSeek.getInstance(), 120);
+
+        Bukkit.broadcast(miniMessage.deserialize("<green>Event started!</green>"), "winterhideandseek.admin");
 
         existingEvent.createRelease();
         existingEvent.setRunning(true);
