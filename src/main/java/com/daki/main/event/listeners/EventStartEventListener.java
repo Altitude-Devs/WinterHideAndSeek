@@ -83,8 +83,6 @@ public class EventStartEventListener implements Listener {
         new BukkitRunnable() {
             public void run() {
                 existingEvent.createTimer();
-                Team team = fillHidersTeam();
-                nameTag(team, false);
                 release.release();
             }
 

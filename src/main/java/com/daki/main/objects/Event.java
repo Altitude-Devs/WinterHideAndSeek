@@ -78,20 +78,12 @@ public class Event {
         timer = new EventTimer(duration);
     }
 
-    public void nameTag(Team team, boolean enabled) {
-        if (enabled) {
-            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
-        } else {
-            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
-        }
-    }
-
-    private Team initHidersTeam() {
+    private void initHidersTeam() {
         hidersTeam = board.getTeam("Hiders");
         if (hidersTeam == null) {
             hidersTeam = board.registerNewTeam("Hiders");
         }
-        return hidersTeam;
+        hidersTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
     }
 
 }
