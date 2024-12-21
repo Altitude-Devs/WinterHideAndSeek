@@ -20,6 +20,7 @@ public class TimerRunnable extends Thread {
     private final EventTimer eventTimer;
     private boolean cancelled;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
+    int lastRemaining = 0;
 
     public TimerRunnable(EventTimer eventTimer) {
         this.eventTimer = eventTimer;
@@ -48,6 +49,10 @@ public class TimerRunnable extends Thread {
 
     private void lessThan15Min(Duration remainingTime) {
         int remainingMinutes = (int) remainingTime.toMinutes();
+        if (remainingMinutes != 0 && remainingMinutes == lastRemaining) {
+            return;
+        }
+        lastRemaining = remainingMinutes;
         if (remainingMinutes != 0) {
             switch (remainingMinutes) {
                 case 10 -> sendMessage("10 minutes remaining!");
@@ -57,6 +62,7 @@ public class TimerRunnable extends Thread {
             }
             return;
         }
+
         switch (remainingTime.toSecondsPart()) {
             case 30 -> sendMessage("30 seconds remaining");
             case 15 -> sendMessage("15 seconds remaining");

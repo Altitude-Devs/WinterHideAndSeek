@@ -6,12 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Event {
 
@@ -47,6 +50,8 @@ public class Event {
             hidersTeam.addEntry(player.getName());
             player.setScoreboard(board);
         }
+        PotionEffect pot = new PotionEffect(PotionEffectType.NIGHT_VISION, (int) TimeUnit.HOURS.toSeconds(2) * 20, 1000); //Set it to 2 hours, shouldn't ever last longer
+        player.addPotionEffect(pot);
     }
 
     public void removeParticipant(Participant participant) {
@@ -54,6 +59,7 @@ public class Event {
         if (participant.getEventRole().equals(EventRole.HIDER)) {
             hidersTeam.removeEntry(participant.getPlayer().getName());
         }
+        participant.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
     }
 
     public Participant getParticipantFromPlayerName(String playerName) {

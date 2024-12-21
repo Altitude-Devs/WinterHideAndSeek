@@ -22,7 +22,7 @@ public class EventTimer {
     }
 
     public Duration getRemainingTime(){
-        Duration remainingTime = Duration.between(startTime, endTime);
+        Duration remainingTime = Duration.between(Instant.now(), endTime);
         return remainingTime.isNegative() ? Duration.ZERO : remainingTime;
     }
 

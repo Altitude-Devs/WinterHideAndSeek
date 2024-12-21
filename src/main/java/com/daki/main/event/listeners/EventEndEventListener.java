@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 
@@ -25,6 +26,7 @@ public class EventEndEventListener implements Listener {
     public void onEventEnd(EventEndEvent event) {
 
         for (Participant participant : EventManager.getExistingEvent().getParticipants()) {
+            participant.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             if (!participant.getEventRole().equals(EventRole.SEEKER)) {
                 continue;
             }

@@ -20,12 +20,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class EventStartEventListener implements Listener {
 
@@ -86,7 +85,21 @@ public class EventStartEventListener implements Listener {
                 release.release();
             }
 
-        }.runTaskLater(WinterHideAndSeek.getInstance(), 6000); //6000
+        }.runTaskLater(WinterHideAndSeek.getInstance(), 6000); //5 minutes in ticks
+
+        AtomicInteger counter = new AtomicInteger(0);
+        new BukkitRunnable() {
+            public void run() {
+                int count = counter.getAndIncrement();
+                if (count > 2) { //Run 3 times
+                    this.cancel();
+                    return;
+                }
+                Title hideSpotTitle = TitleCreator.createTitle("<white>FIND A SPOT TO HIDE IN",
+                        String.format("SEEKERS WILL BE RELEASED IN %d MINUTE(S)", 4 - count), 1, 5, 1);
+                existingEvent.getParticipants().forEach(participant -> participant.getPlayer().showTitle(hideSpotTitle));
+            }
+        }.runTaskTimer(WinterHideAndSeek.getInstance(), 1200, 1200); //Run every minute (internal logic stops it at 1 minute remaining assuming 5 minutes initially)
 
         EventManager.getExistingEvent().setRunning(true);
     }

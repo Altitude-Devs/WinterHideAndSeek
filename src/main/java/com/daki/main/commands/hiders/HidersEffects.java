@@ -11,6 +11,8 @@ import com.daki.main.objects.Participant;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -147,8 +149,23 @@ public class HidersEffects implements CommandExecutor {
             if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
                 continue;
             }
-            PotionEffect pot = new PotionEffect(PotionEffectType.SLOWNESS, duration * 20, 1000);
-            player.addPotionEffect(pot);
+            setPlayerSpeed(player, 0);
         }
+        Bukkit.getScheduler().scheduleSyncDelayedTask(WinterHideAndSeek.getInstance(), () -> {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                if (!EventManager.getExistingEvent().getParticipantFromPlayerName(player.getName()).getEventRole().equals(EventRole.HIDER)) {
+                    continue;
+                }
+                setPlayerSpeed(player, 0.1);
+            }
+        }, duration * 20);
+    }
+
+    private static void setPlayerSpeed(Player player, double value) {
+        AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        if (attribute == null) {
+            return;
+        }
+        attribute.setBaseValue(value);
     }
 }
