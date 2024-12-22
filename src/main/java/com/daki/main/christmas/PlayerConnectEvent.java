@@ -7,6 +7,8 @@ import com.daki.main.objects.Participant;
 import com.daki.main.objects.TitleCreator;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +20,7 @@ public class PlayerConnectEvent implements Listener {
     public void onPlayerConnect(PlayerJoinEvent e) {
         Event event = EventManager.getExistingEvent();
         Player player = e.getPlayer();
-
+        setPlayerSpeed(player, 0.1);
         if (player.hasPermission("winterhideandseek.bypass")) {
             return;
         }
@@ -38,5 +40,13 @@ public class PlayerConnectEvent implements Listener {
                     1, 3, 1);
             player.showTitle(title);
         }
+    }
+
+    private static void setPlayerSpeed(Player player, double value) {
+        AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        if (attribute == null) {
+            return;
+        }
+        attribute.setBaseValue(value);
     }
 }
